@@ -4,24 +4,25 @@ using UnityEngine;
 
 public class Supervisor : MonoBehaviour
 {
+    public GameObject workflowGameObject;
+    Workflow workflow;
     // Start is called before the first frame update
     void Start()
     {
-
+        workflow = workflowGameObject.GetComponent<IWorkflow>().LoadWorkflow();
     }
 
-    // Update is called once per frame
-    void Update()
+    public interface IWorkflow
     {
-
+        Workflow LoadWorkflow();
     }
-
+    
     public class InputField
     {
         public string dataType;
-        public string value;
+        public string value = "";
 
-        public void InputFIeld(string dataType)
+        public InputField(string dataType)
         {
             this.dataType = dataType;
         }
@@ -62,8 +63,8 @@ public class Supervisor : MonoBehaviour
 
     public class Action
     {
-        public List<Supervisor.InputField> inputFields;
-        public List<Supervisor.Action> nextActions;
+        public List<Supervisor.InputField> inputFields = new List<Supervisor.InputField>() { };
+        public List<Supervisor.Action> nextActions = new List<Supervisor.Action>() { };
 
         public void AddNextAction(Supervisor.Action nextAction)
         {
@@ -78,6 +79,57 @@ public class Supervisor : MonoBehaviour
         public void addInputField (Supervisor.InputField inputField)
         {
             inputFields.Add(inputField);
+        }
+
+        public void removeInputField (Supervisor.InputField inputField)
+        {
+            inputFields.Remove(inputField);
+        }
+    }
+
+    public class Workflow
+    {
+        Supervisor.Action startingAction;
+        Supervisor.Action currentAction;
+        Supervisor.Action previousAction;
+        List<Supervisor.Action> nextActions;
+
+        public Workflow(Supervisor.Action action)
+        {
+            this.startingAction = action;
+            this.currentAction = action;
+            this.nextActions = action.nextActions;
+        }
+
+        public Supervisor.Action GetCurrentAction()
+        {
+            return this.currentAction;
+        }
+
+        public Supervisor.Action GetPreviousAction()
+        {
+            return this.previousAction;
+        }
+
+        public List<Supervisor.Action> GetNextActions()
+        {
+            return this.nextActions;
+        }
+
+        public void Forward(Supervisor.Action action = null)
+        {
+            this.previousAction = this.currentAction;
+
+            if (action != null)
+            {
+                this.currentAction = action;
+                this.nextActions = action.nextActions;
+            } else
+            {
+                this.currentAction = nextActions[0];
+                this.nextActions = currentAction.nextActions;
+            }
+
         }
     }
 }
