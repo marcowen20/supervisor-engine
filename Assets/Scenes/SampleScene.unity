@@ -130,6 +130,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 180491217}
+  - component: {fileID: 180491218}
   m_Layer: 0
   m_Name: Assistant
   m_TagString: Untagged
@@ -151,6 +152,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &180491218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180491216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 709851b1685b449428240eab7c983dac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,6 +276,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6efe347e8396f724998c9c062a497c36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  supervisorGameObject: {fileID: 795217250}
 --- !u!4 &666708516
 Transform:
   m_ObjectHideFlags: 0
@@ -307,6 +321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   workflowGameObject: {fileID: 1887504218}
+  assistantGameObject: {fileID: 180491216}
 --- !u!4 &795217252
 Transform:
   m_ObjectHideFlags: 0

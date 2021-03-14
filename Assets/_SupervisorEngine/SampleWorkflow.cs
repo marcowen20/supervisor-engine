@@ -19,10 +19,14 @@ public class SampleWorkflow : MonoBehaviour, Supervisor.IWorkflow
             this.parameterField.SetValue(parameter);
         }
 
-        public List<Supervisor.InputField> GetList()
+        public Dictionary<string, Supervisor.InputField> GetDict()
         {
-            Supervisor.InputField[] genericInputFields = new Supervisor.InputField[] { this.actionField, this.targetField, this.parameterField };
-            return new List<Supervisor.InputField>(genericInputFields);
+            Dictionary<string, Supervisor.InputField> genericInputFields = new Dictionary<string, Supervisor.InputField>();
+            genericInputFields.Add("action", actionField);
+            genericInputFields.Add("target", targetField);
+            genericInputFields.Add("parameter", parameterField);
+
+            return genericInputFields;
         }
     }
 
@@ -35,22 +39,23 @@ public class SampleWorkflow : MonoBehaviour, Supervisor.IWorkflow
         Supervisor.InputField[] genericInputField = new Supervisor.InputField[] { actionField, targetField, parameterField };
 
         Supervisor.Action actionOne = new Supervisor.Action();
-        actionOne.inputFields = new GenericInputFields("grab", "Flask").GetList();
+        actionOne.inputFields = new GenericInputFields("grab", "Flask").GetDict();
 
         Supervisor.Action actionTwo = new Supervisor.Action();
-        actionTwo.inputFields = new GenericInputFields("place", "Flask Place Target").GetList();
+        actionTwo.inputFields = new GenericInputFields("place", "Flask Place Target").GetDict();
 
         Supervisor.Action actionThree = new Supervisor.Action();
-        actionThree.inputFields = new GenericInputFields("turn on", "Bunsen Burner").GetList();
+        actionThree.inputFields = new GenericInputFields("turn on", "Bunsen Burner").GetDict();
 
         Supervisor.Action actionFour = new Supervisor.Action();
-        actionFour.inputFields = new GenericInputFields("turn off", "Bunsen Burner").GetList();
+        actionFour.inputFields = new GenericInputFields("turn off", "Bunsen Burner").GetDict();
 
         actionOne.AddNextAction(actionTwo);
         actionTwo.AddNextAction(actionThree);
         actionThree.AddNextAction(actionFour);
 
-        workflow = new Supervisor.Workflow(actionOne);
+        List<Supervisor.Action> startingList = new List<Supervisor.Action>() { actionOne };
+        workflow = new Supervisor.Workflow(startingList);
         return workflow;
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class Supervisor : MonoBehaviour
 {
     public GameObject workflowGameObject;
+    public GameObject assistantGameObject;
     Workflow workflow;
     // Start is called before the first frame update
     void Start()
@@ -12,11 +13,15 @@ public class Supervisor : MonoBehaviour
         workflow = workflowGameObject.GetComponent<IWorkflow>().LoadWorkflow();
     }
 
+    public interface IAssistant
+    {
+        void DoAction(Action actionTODO);
+    }
     public interface IWorkflow
     {
         Workflow LoadWorkflow();
     }
-    
+
     public class InputField
     {
         public string dataType;
@@ -63,9 +68,15 @@ public class Supervisor : MonoBehaviour
 
     public class Action
     {
-        public List<Supervisor.InputField> inputFields = new List<Supervisor.InputField>() { };
+        public Dictionary<string, Supervisor.InputField> inputFields = new Dictionary<string, InputField>();
         public List<Supervisor.Action> nextActions = new List<Supervisor.Action>() { };
+        public bool isPassive;
 
+        public Action(bool isPassive = false)
+        {
+            this.isPassive = isPassive;
+        }
+        
         public void AddNextAction(Supervisor.Action nextAction)
         {
             nextActions.Add(nextAction);
@@ -76,34 +87,33 @@ public class Supervisor : MonoBehaviour
             nextActions.Remove(targetAction);
         }
 
-        public void addInputField (Supervisor.InputField inputField)
+        public void addInputField(string fieldName, Supervisor.InputField inputField)
         {
-            inputFields.Add(inputField);
+            inputFields.Add(fieldName, inputField);
         }
 
-        public void removeInputField (Supervisor.InputField inputField)
+        public void removeInputField(string fieldName)
         {
-            inputFields.Remove(inputField);
+            inputFields.Remove(fieldName);
         }
     }
 
     public class Workflow
     {
-        Supervisor.Action startingAction;
-        Supervisor.Action currentAction;
         Supervisor.Action previousAction;
-        List<Supervisor.Action> nextActions;
+        List<Supervisor.Action> startingActions;
+        List<Supervisor.Action> currentActions;
+        //List<Supervisor.Action> nextActions;
 
-        public Workflow(Supervisor.Action action)
+        public Workflow(List<Supervisor.Action> actions)
         {
-            this.startingAction = action;
-            this.currentAction = action;
-            this.nextActions = action.nextActions;
+            this.startingActions = actions;
+            this.currentActions = actions;
         }
 
-        public Supervisor.Action GetCurrentAction()
+        public List<Supervisor.Action> GetCurrentActions()
         {
-            return this.currentAction;
+            return this.currentActions;
         }
 
         public Supervisor.Action GetPreviousAction()
@@ -113,23 +123,49 @@ public class Supervisor : MonoBehaviour
 
         public List<Supervisor.Action> GetNextActions()
         {
-            return this.nextActions;
+            return new List<Supervisor.Action> { };
         }
 
         public void Forward(Supervisor.Action action = null)
         {
-            this.previousAction = this.currentAction;
-
-            if (action != null)
+            if (action == null)
             {
-                this.currentAction = action;
-                this.nextActions = action.nextActions;
-            } else
-            {
-                this.currentAction = nextActions[0];
-                this.nextActions = currentAction.nextActions;
+                action = this.currentActions[0];
             }
-
+            
+            this.previousAction = action;
+            this.currentActions = action.nextActions;
         }
+    }
+
+    public void SendIntention(Supervisor.Action intention)
+    {
+        IAssistant assistant = assistantGameObject.GetComponent<IAssistant>();
+
+        // Check if intention is in current actions
+        bool intentionIsValid = true;
+
+        foreach (Supervisor.Action workflowAction in workflow.GetCurrentActions())
+        {
+            foreach (string workflowInputField in workflowAction.inputFields.Keys)
+            {
+                Debug.Log(workflowAction.inputFields[workflowInputField].value + intention.inputFields[workflowInputField].value);
+                if (workflowAction.inputFields[workflowInputField].value != intention.inputFields[workflowInputField].value)
+                {
+                    intentionIsValid = false;
+                }
+            }
+        }
+
+        if (intentionIsValid)
+        {
+            assistant.DoAction(intention);
+            workflow.Forward(intention);
+        }
+        
+        //if (workflow.GetCurrentActions()[0].isPassive)
+        //{
+        //    SendIntention(workflow.GetCurrentActions()[0]);
+        //}
     }
 }
