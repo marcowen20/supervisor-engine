@@ -132,9 +132,22 @@ public class Supervisor : MonoBehaviour
             {
                 action = this.currentActions[0];
             }
-            
-            this.previousAction = action;
-            this.currentActions = action.nextActions;
+
+            // Search for action in currentActions
+            int actionIndex = 0;
+            int counter = 0;
+            foreach (Supervisor.Action currentAction in GetCurrentActions()){
+                if(currentAction.inputFields["action"].value == action.inputFields["action"].value &&
+                    currentAction.inputFields["target"].value == action.inputFields["target"].value &&
+                    currentAction.inputFields["parameter"].value == action.inputFields["parameter"].value)
+                {
+                    actionIndex = counter;
+                }
+                counter++;
+            }
+
+            this.previousAction = GetCurrentActions()[actionIndex];
+            this.currentActions = GetCurrentActions()[actionIndex].nextActions;
         }
     }
 
@@ -163,9 +176,9 @@ public class Supervisor : MonoBehaviour
             workflow.Forward(intention);
         }
         
-        //if (workflow.GetCurrentActions()[0].isPassive)
-        //{
-        //    SendIntention(workflow.GetCurrentActions()[0]);
-        //}
+        if (workflow.GetCurrentActions()[0].isPassive)
+        {
+            SendIntention(workflow.GetCurrentActions()[0]);
+        }
     }
 }

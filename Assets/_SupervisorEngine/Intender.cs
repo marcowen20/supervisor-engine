@@ -6,8 +6,6 @@ public class Intender : MonoBehaviour
 {
     public GameObject supervisorGameObject;
     Supervisor supervisor;
-    bool doneFirstIntention;
-    Supervisor.Action firstIntention;
 
     public class GenericInputFields
     {
@@ -33,14 +31,17 @@ public class Intender : MonoBehaviour
         }
     }
 
+    bool doneFirstIntention;
+    Supervisor.Action firstIntention;
+
     void Start()
     {
         doneFirstIntention = false;
         supervisor = supervisorGameObject.GetComponent<Supervisor>();
+
         firstIntention = new Supervisor.Action();
-
         firstIntention.inputFields = new GenericInputFields("grab", "Flask").GetDict();
-
+        
     }
 
     // Update is called once per frame
